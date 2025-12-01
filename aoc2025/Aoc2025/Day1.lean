@@ -43,7 +43,7 @@ theorem nat_eq_zero_of_zero_eq_zero_sub (n : Nat)
     n = 0 := by
   have h' := congrArg (fun z : Int => z + (n : Int)) h
   have h'' : (n : Int) = 0 := by
-    simpa [Int.sub_eq_add_neg, Int.add_comm, Int.add_left_comm, Int.add_assoc, Int.add_right_neg] using h'
+    simpa [Int.sub_eq_add_neg, Int.add_comm, Int.add_right_neg] using h'
   exact Int.ofNat_eq_zero.mp h''
 
 theorem does_not_return_zero

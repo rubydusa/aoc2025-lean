@@ -3,12 +3,12 @@
 import Std
 open Std
 
-inductive Instruction where
+inductive IOInstruction where
   | L (n : Nat)
   | R (n : Nat)
   deriving Repr, BEq
 
-def parseLine (s : String) : Except String Instruction := do
+def parseLine (s : String) : Except String IOInstruction := do
   let s := s.trim
   if s.isEmpty then
     throw "empty line"
@@ -29,12 +29,12 @@ def parseLine (s : String) : Except String Instruction := do
 
   -- Finally, decide L/R
   match c with
-  | 'L' => return Instruction.L n
-  | 'R' => return Instruction.R n
+  | 'L' => return IOInstruction.L n
+  | 'R' => return IOInstruction.R n
   | _   => throw s!"unknown instruction kind: '{c}'"
 
 def parseFileContents (contents : String) :
-    Except String (Array Instruction) :=
+    Except String (Array IOInstruction) :=
   let lines := contents.splitOn "\n"
   lines.foldl
     (fun acc line =>
@@ -52,6 +52,6 @@ def parseFileContents (contents : String) :
     (Except.ok #[])
 
 def loadInstructions (path : System.FilePath) :
-    IO (Except String (Array Instruction)) := do
+    IO (Except String (Array IOInstruction)) := do
   let contents ← IO.FS.readFile path
   pure (parseFileContents contents)

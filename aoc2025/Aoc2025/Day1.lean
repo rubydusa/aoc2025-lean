@@ -1,9 +1,3 @@
-def NatNotMulOf (m : Nat) := { n : Nat // ¬ m ∣ n }
-
-inductive Instruction (m: Nat)
-| L (n: NatNotMulOf m)
-| R (n: NatNotMulOf m)
-
 structure State (m: Nat) where
   dial: Int
   times: Nat
@@ -12,6 +6,16 @@ def start_state: State 100 := {
   dial := 50,
   times := 0
 }
+
+-------------------------------------
+-- First half                      --
+-------------------------------------
+
+def NatNotMulOf (m : Nat) := { n : Nat // ¬ m ∣ n }
+
+inductive Instruction (m: Nat)
+| L (n: NatNotMulOf m)
+| R (n: NatNotMulOf m)
 
 def step (s: State m) (i: Instruction m) : State m :=
   let newDial: Int := match i with
@@ -25,6 +29,44 @@ def step (s: State m) (i: Instruction m) : State m :=
 
 def run (is: List (Instruction m)) (s: State m): State m :=
   is.foldl step s
+
+-------------------------------------
+-- Second half                     --
+-------------------------------------
+
+inductive Instruction2
+| L (n : Nat) [NeZero n]
+| R (n : Nat) [NeZero n]
+
+-- ugly ass solution but tired
+def step2 (s : State m) (i : Instruction2) : State m :=
+  let new_dial := match i with
+  | Instruction2.L n => (s.dial - n) % m
+  | Instruction2.R n => (s.dial + n) % m
+  let add_times' := match i with
+  | Instruction2.L n => n / m + Bool.toNat (s.dial - (n % m) ≤ 0 ∧ s.dial ≠ 0)
+  | Instruction2.R n => n / m + Bool.toNat (s.dial + (n % m) ≥ m ∧ s.dial ≠ 0)
+  let new_times := s.times + add_times'
+  {
+    dial := new_dial,
+    times := new_times
+  }
+
+def run2 (is: List Instruction2) (s : State m) : State m :=
+  is.foldl step2 s
+
+#eval run2 [
+  Instruction2.L 68,
+  Instruction2.L 30,
+  Instruction2.R 48,
+  Instruction2.L 5,
+  Instruction2.R 60,
+  Instruction2.L 55,
+  Instruction2.L 1,
+  Instruction2.L 99,
+  Instruction2.R 14,
+  Instruction2.L 82
+  ] start_state
 
 -------------------------------------
 -- Theorems                        --

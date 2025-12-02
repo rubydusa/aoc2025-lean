@@ -68,7 +68,39 @@ theorem does_not_return_zero
         (step s0 (Instruction.R n)).dial = s0.dial + n.1 := stepDialR
         _                                = 0 + n.1 := by rw [hp]
         _                                = n.1     := by simp
+      -- feeling kind of iffy about to congrArg Int.toNat
       let n_eq0 : n.1 = 0 := congrArg Int.toNat (s1_dial_zero.symm.trans h₁).symm
       let mDividesZero : m ∣ 0 := ⟨0, by simp⟩
       let contradiction : m ∣ n.1 := by simpa [n_eq0] using mDividesZero
       absurd contradiction n.2
+
+-- eh fuck it the definitions I wrote are bad, not going to finish proving this
+-- theorem run_empty_list_no_change
+--   (s0: State m) : (run [] s0).times = s0.times := by
+--   simp [run]
+
+-- theorem run_times_upper_bound_half_empty_list
+--   (s0: State m) (hp: s0.times = 0) :
+--   let sn := run [] s0; sn.times ≤ (([] : List (Instruction m)).length / 2) :=
+--     let sn := run [] s0
+--     let sn_times := calc
+--       sn.times = s0.times := run_empty_list_no_change s0
+--       _        = 0        := hp
+--     let sn_times_le_zero := Nat.le_zero.mpr sn_times
+--     by
+--       rw [List.length_nil, Nat.zero_div]
+--       exact sn_times_le_zero
+
+-- theorem run_times_upper_bound_half_dial_zero
+--   (s0 : State m) (hp₁ : s0.times = 0) (hp₂ : s0.dial = 0):
+--   ∀ (steps: List (Instruction m)), let sn := run steps s0; sn.times ≤ (steps.length / 2) :=
+--   fun steps =>
+--     match steps with
+--     | [] => run_times_upper_bound_half_empty_list s0 hp₁
+--     | h₁ :: t₁ =>
+--       let s1_zero_times := does_not_return_zero s0 hp₂ h₁
+--       match t₁ with
+--       | [] =>
+--         sorry
+--       | h₂ :: t₂ =>
+--         sorry
